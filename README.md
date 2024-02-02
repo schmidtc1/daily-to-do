@@ -16,3 +16,10 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 ## Dependency Management
 
 The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+
+## Objectives
+
+- `Set items`: the user should be able to set different items for different days
+- `Manipulate items`: the user should be able to check, add, or delete items
+- `Startup`: the app should open on startup
+- `Daily reset`: the items should reset daily/weekly

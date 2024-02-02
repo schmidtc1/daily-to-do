@@ -1,4 +1,9 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import javax.swing.*;
 public class gui{
@@ -8,30 +13,34 @@ public class gui{
         frame.setSize(400, 400);
 
         JMenuBar mb = new JMenuBar();
+        
         JMenu m1 = new JMenu("FILE");
         JMenu m2 = new JMenu("Help");
         mb.add(m1);
         mb.add(m2);
-        JMenuItem mi1 = new JMenuItem("Open");
-        JMenuItem mi2 = new JMenuItem("Save as");
+        JMenuItem mi1 = new JMenuItem("Add item");
+        JMenuItem mi2 = new JMenuItem("Edit item");
         m1.add(mi1);
-        m2.add(mi2);
+        m1.add(mi2);
 
         JPanel panel = new JPanel();
-        JLabel label = new JLabel("Enter Text");
-        JTextField tf = new JTextField(10);
-        JButton send = new JButton("Send");
-        JButton reset = new JButton("Reset");
-        panel.add(label);
-        panel.add(tf);
-        panel.add(send);
-        panel.add(reset);
+        panel.setBorder(BorderFactory.createLineBorder(Color.black));
+        JButton prev = new JButton("←");
+        JLabel date = new JLabel("Friday");
+        JButton next = new JButton("→");
+        panel.add(prev);
+        panel.add(date);
+        panel.add(next);
 
-        JTextArea ta = new JTextArea();
+        JPanel checklist = new JPanel();
+        checklist.setBorder(BorderFactory.createLineBorder(Color.black));
+        JCheckBox ca = new JCheckBox("Placeholder");
+        checklist.add(ca);        
 
-        frame.getContentPane().add(panel, BorderLayout.SOUTH);
+
         frame.getContentPane().add(mb, BorderLayout.NORTH);
-        frame.getContentPane().add(ta, BorderLayout.CENTER);
+        frame.getContentPane().add(panel, BorderLayout.CENTER);
+        frame.getContentPane().add(checklist, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
 }
