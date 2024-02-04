@@ -87,7 +87,16 @@ public class gui extends Frame implements ActionListener {
         frame.setVisible(true);
     }
     public static void main(String args[]) {
-        gui g = new gui();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    new gui();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
