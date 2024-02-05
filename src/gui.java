@@ -9,13 +9,16 @@ import javax.swing.*;
 public class gui extends Frame implements ActionListener {
 
     private JMenuBar mb;
+    private JMenu m1, m2;
+    private JMenuItem mi1, mi2;
 
     private JFrame frame;
 
-    private JPanel panel;
-    private JPanel date;
-    private JPanel lp;
-    private JPanel list;
+    private JPanel panel, date, lp, list;
+
+
+
+    int count = 2;
 
     private void buildWindow() {
         frame = new JFrame("GUI");
@@ -26,17 +29,19 @@ public class gui extends Frame implements ActionListener {
     private void buildMenu() {
         mb = new JMenuBar();
         mb.setMaximumSize(new Dimension(400, 30));
-        JMenu m1 = new JMenu("FILE");
-        JMenu m2 = new JMenu("Help");
+        m1 = new JMenu("FILE");
+        m2 = new JMenu("Help");
         mb.add(m1);
         mb.add(m2);
-        JMenuItem mi1 = new JMenuItem("Add item");
-        JMenuItem mi2 = new JMenuItem("Edit item");
+        mi1 = new JMenuItem("Add item");
+        mi2 = new JMenuItem("Edit item");
         
         mi1.addActionListener(this);
 
         m1.add(mi1);
         m1.add(mi2);
+
+        frame.setJMenuBar(mb);
     }
 
     private void buildDate() {
@@ -58,15 +63,18 @@ public class gui extends Frame implements ActionListener {
         list.setLayout(new BoxLayout(list, BoxLayout.PAGE_AXIS));
         list.setBorder(BorderFactory.createLineBorder(Color.black));
         
-        list.add(new JCheckBox("Placeholder"));
-        list.add(new JCheckBox("number 2"));
+        list.add(new JCheckBox("1"));
+        list.add(new JCheckBox("2"));
+        
     
         lp.add(list, BorderLayout.WEST);
         list.setPreferredSize(new Dimension(400, 330));
+
     }
 
     private void addListItem() {
-        list.add(new JCheckBox("New item"));
+        list.add(new JCheckBox(Integer.toString(count)));
+        list.revalidate();
     }
 
     public gui() {
@@ -79,7 +87,7 @@ public class gui extends Frame implements ActionListener {
         buildDate();
         buildChecklist();
 
-        panel.add(mb);
+        //panel.add(mb);
         panel.add(date);
         panel.add(lp);
 
@@ -103,7 +111,7 @@ public class gui extends Frame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         // throw new UnsupportedOperationException("Unimplemented method 'actionPerformed'");
         if (e.getActionCommand() == "Add item") {
-            System.out.println("test");
+            count++;
             addListItem();
         }
     }
