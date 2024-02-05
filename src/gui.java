@@ -107,6 +107,13 @@ public class gui extends Frame implements ActionListener {
         });
     }
 
+    private ActionListener addItem = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
+    };
+
     @Override
     public void actionPerformed(ActionEvent e) {
         // throw new UnsupportedOperationException("Unimplemented method 'actionPerformed'");
