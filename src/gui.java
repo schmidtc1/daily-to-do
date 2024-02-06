@@ -78,8 +78,8 @@ public class gui {
 
     }
 
-    private void addListItem() {
-        list.add(new JCheckBox(Integer.toString(count)));
+    private void addListItem(String todo) {
+        list.add(new JCheckBox(todo));
         list.revalidate();
     }
 
@@ -117,7 +117,8 @@ public class gui {
         @Override
         public void actionPerformed(ActionEvent e) {
             count++;
-            addListItem();
+            String todo = JOptionPane.showInputDialog(panel, "Input an item", null);
+            addListItem(todo); 
         }
     };
 }
