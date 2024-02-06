@@ -1,18 +1,21 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.time.LocalDate;
 import javax.swing.*;
-public class gui extends Frame implements ActionListener {
+
+
+public class gui {
 
     private JMenuBar mb;
     private JMenu m1, m2;
     private JMenuItem mi1, mi2;
 
     private JFrame frame;
+    
+    private JLabel currDay;
 
     private JPanel panel, date, lp, list;
 
@@ -35,8 +38,10 @@ public class gui extends Frame implements ActionListener {
         mb.add(m2);
         mi1 = new JMenuItem("Add item");
         mi2 = new JMenuItem("Edit item");
+
         
-        mi1.addActionListener(this);
+        
+        mi1.addActionListener(addItem);
 
         m1.add(mi1);
         m1.add(mi2);
@@ -48,11 +53,12 @@ public class gui extends Frame implements ActionListener {
         date = new JPanel();
         date.setMaximumSize(new Dimension(400, 40));
         date.setBorder(BorderFactory.createLineBorder(Color.black));
+
         JButton prev = new JButton("←");
-        JLabel day = new JLabel("Friday");
+        currDay = new JLabel(LocalDate.now().getDayOfWeek().toString());
         JButton next = new JButton("→");
         date.add(prev);
-        date.add(day);
+        date.add(currDay);
         date.add(next);
     }
 
@@ -110,16 +116,8 @@ public class gui extends Frame implements ActionListener {
     private ActionListener addItem = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-
-        }
-    };
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // throw new UnsupportedOperationException("Unimplemented method 'actionPerformed'");
-        if (e.getActionCommand() == "Add item") {
             count++;
             addListItem();
         }
-    }
+    };
 }
