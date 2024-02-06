@@ -68,10 +68,6 @@ public class gui {
         list = new JPanel();
         list.setLayout(new BoxLayout(list, BoxLayout.PAGE_AXIS));
         list.setBorder(BorderFactory.createLineBorder(Color.black));
-        
-        list.add(new JCheckBox("1"));
-        list.add(new JCheckBox("2"));
-        
     
         lp.add(list, BorderLayout.WEST);
         list.setPreferredSize(new Dimension(400, 330));
@@ -118,7 +114,7 @@ public class gui {
         public void actionPerformed(ActionEvent e) {
             count++;
             String todo = JOptionPane.showInputDialog(panel, "Input an item", null);
-            addListItem(todo); 
+            if (todo != null) addListItem(todo); 
         }
     };
 }
