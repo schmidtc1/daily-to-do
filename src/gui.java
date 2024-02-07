@@ -19,7 +19,8 @@ public class Gui {
 
     private JPanel panel, date, lp, list;
 
-
+    private Checklist checklist = new Checklist();
+    private ChecklistModel checklistModel = new ChecklistModel(this.checklist);
 
     int count = 2;
 
@@ -75,7 +76,9 @@ public class Gui {
     }
 
     private void addListItem(String todo) {
-        list.add(new JCheckBox(todo));
+        JCheckBox chk = new JCheckBox(todo);
+        checklistModel.add(new Item(todo, LocalDate.now(), chk));
+        list.add(chk);
         list.revalidate();
     }
 
