@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import javax.swing.*;
 
 
-public class gui {
+public class Gui {
 
     private JMenuBar mb;
     private JMenu m1, m2;
@@ -79,7 +79,7 @@ public class gui {
         list.revalidate();
     }
 
-    public gui() {
+    public Gui() {
         buildWindow();
 
         panel = new JPanel();
@@ -101,7 +101,7 @@ public class gui {
             @Override
             public void run() {
                 try {
-                    new gui();
+                    new Gui();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
