@@ -1,10 +1,12 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -62,11 +64,13 @@ public class Gui {
         date.setBorder(BorderFactory.createLineBorder(Color.black));
 
         
-        checklistModel.setDay(today);
-        day = new JLabel(today.toString());
+        if (checklistModel.getCurrDayOfWeek() == null) checklistModel.setDay(today);
+        day = new JLabel(checklistModel.getCurrDayOfWeek().toString());
 
         JButton prev = new JButton("←");
+        prev.addActionListener(decrementDate);
         JButton next = new JButton("→");
+        next.addActionListener(incrementDate);
         date.add(prev);
         date.add(day);
         date.add(next);
@@ -88,10 +92,30 @@ public class Gui {
         JCheckBox chk = new JCheckBox(todo);
         checklistModel.add(day, new Item(todo, day, chk));
 
-        if (day.equals(today)) {
+        if (day.equals(checklistModel.getCurrDayOfWeek())) {
             list.add(chk);
             list.revalidate();
         }
+    }
+
+    private void updateList() {
+        Component[] cList = lp.getComponents();
+        for (Component c : cList) {
+            if (c instanceof JPanel) {
+                lp.remove(c);
+            }
+        }
+
+        list.removeAll();
+        List<Item> l = checklistModel.getList();
+        if (l != null) {
+            for (int i = 0; i < l.size(); i++) {
+                list.add(l.get(i).getCheckbox());
+            }
+        }
+        lp.add(list);
+        panel.revalidate();
+        panel.repaint();
     }
 
     public Gui() {
@@ -131,6 +155,26 @@ public class Gui {
             
             int day = JOptionPane.showOptionDialog(panel, "Select a day:", "Which day?", 0, 3, null, options, options[0]);
             if (todo != null) addListItem(todo, DayOfWeek.of(day + 1)); 
+        }
+    };
+
+    private ActionListener decrementDate = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            checklistModel.decrementDay();
+            day.setText(checklistModel.getCurrDayOfWeek().toString());
+            
+            updateList();
+        }
+    };
+
+    private ActionListener incrementDate = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            checklistModel.incrementDay();
+            day.setText(checklistModel.getCurrDayOfWeek().toString());
+
+            updateList();
         }
     };
 }

@@ -33,4 +33,8 @@ public class Checklist {
     public Item get(DayOfWeek day, int index) {
         return this.map.get(day).get(index);
     }
+
+    public List<Item> getList(DayOfWeek day) {
+        return this.map.get(day);
+    }
 }

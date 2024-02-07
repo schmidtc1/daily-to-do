@@ -1,5 +1,6 @@
 import javax.swing.AbstractListModel;
 import java.time.DayOfWeek;
+import java.util.List;
 
 public class ChecklistModel extends AbstractListModel<Item> {
     private Checklist list;
@@ -13,9 +14,25 @@ public class ChecklistModel extends AbstractListModel<Item> {
         curr = _curr;
     }
 
+    public DayOfWeek getCurrDayOfWeek() {
+        return curr;
+    }
+
+    public void decrementDay() {
+        curr = curr.minus(1);
+    }
+    
+    public void incrementDay() {
+        curr = curr.plus(1);
+    }
+
     public void add(DayOfWeek day, Item item) {
         this.list.add(day, item);
         this.fireContentsChanged(this, getSize() - 1, getSize() - 1);
+    }
+
+    public List<Item> getList() {
+        return this.list.getList(curr);
     }
 
     @Override
