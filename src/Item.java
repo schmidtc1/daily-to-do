@@ -1,24 +1,23 @@
-import java.time.LocalDate;
-
 import javax.swing.JCheckBox;
+import java.time.DayOfWeek;
 
 public class Item {
     private String text;
-    private LocalDate date;
+    private DayOfWeek day;
     private JCheckBox checkbox;
 
-    public Item(String _text, LocalDate _date, JCheckBox _checkbox) {
+    public Item(String _text, DayOfWeek _day, JCheckBox _checkbox) {
         text = _text;
         checkbox = _checkbox;
-        date = _date;
+        day = _day;
     }
 
     public String getText() {
         return text;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public DayOfWeek getDay() {
+        return day;
     }
 
     public JCheckBox getCheckbox() {
@@ -29,8 +28,8 @@ public class Item {
         text = _text;
     }
 
-    public void setDate(LocalDate _date) {
-        date = _date;
+    public void setDay(DayOfWeek _day) {
+        day = _day;
     }
 
     public void setCheckbox(JCheckBox _checkbox) {

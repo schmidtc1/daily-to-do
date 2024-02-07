@@ -3,11 +3,16 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+
 import javax.swing.*;
 
 
+
 public class Gui {
+
+    static String[] options = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
 
     private JMenuBar mb;
     private JMenu m1, m2;
@@ -15,14 +20,15 @@ public class Gui {
 
     private JFrame frame;
     
-    private JLabel currDay;
+    private JLabel day;
+    private DayOfWeek today = LocalDate.now().getDayOfWeek();
 
     private JPanel panel, date, lp, list;
 
     private Checklist checklist = new Checklist();
     private ChecklistModel checklistModel = new ChecklistModel(this.checklist);
 
-    int count = 2;
+    
 
     private void buildWindow() {
         frame = new JFrame("GUI");
@@ -55,11 +61,14 @@ public class Gui {
         date.setMaximumSize(new Dimension(400, 40));
         date.setBorder(BorderFactory.createLineBorder(Color.black));
 
+        
+        checklistModel.setDay(today);
+        day = new JLabel(today.toString());
+
         JButton prev = new JButton("←");
-        currDay = new JLabel(LocalDate.now().getDayOfWeek().toString());
         JButton next = new JButton("→");
         date.add(prev);
-        date.add(currDay);
+        date.add(day);
         date.add(next);
     }
 
@@ -75,11 +84,14 @@ public class Gui {
 
     }
 
-    private void addListItem(String todo) {
+    private void addListItem(String todo, DayOfWeek day) {
         JCheckBox chk = new JCheckBox(todo);
-        checklistModel.add(new Item(todo, LocalDate.now(), chk));
-        list.add(chk);
-        list.revalidate();
+        checklistModel.add(day, new Item(todo, day, chk));
+
+        if (day.equals(today)) {
+            list.add(chk);
+            list.revalidate();
+        }
     }
 
     public Gui() {
@@ -115,9 +127,10 @@ public class Gui {
     private ActionListener addItem = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            count++;
             String todo = JOptionPane.showInputDialog(panel, "Input an item", null);
-            if (todo != null) addListItem(todo); 
+            
+            int day = JOptionPane.showOptionDialog(panel, "Select a day:", "Which day?", 0, 3, null, options, options[0]);
+            if (todo != null) addListItem(todo, DayOfWeek.of(day + 1)); 
         }
     };
 }
