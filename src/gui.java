@@ -25,7 +25,7 @@ public class Gui {
     private JLabel day;
     private DayOfWeek today = LocalDate.now().getDayOfWeek();
 
-    private JPanel panel, date, lp, list;
+    private JPanel panel, date, lp, list, bp;
 
     private Checklist checklist = new Checklist();
     private ChecklistModel checklistModel = new ChecklistModel(this.checklist);
@@ -88,6 +88,13 @@ public class Gui {
 
     }
 
+    private void buildAddButton() {
+        JButton addItemButton = new JButton("Add item");
+        bp = new JPanel(new BorderLayout());
+        bp.add(addItemButton);
+        addItemButton.addActionListener(addItem);
+    }
+
     private void addListItem(String todo, DayOfWeek day) {
         JCheckBox chk = new JCheckBox(todo);
         checklistModel.add(day, new Item(todo, day, chk));
@@ -127,10 +134,12 @@ public class Gui {
         buildMenu();
         buildDate();
         buildChecklist();
+        buildAddButton();
 
         //panel.add(mb);
         panel.add(date);
         panel.add(lp);
+        panel.add(bp);
 
         frame.getContentPane().add(panel);
         frame.setVisible(true);
@@ -155,6 +164,13 @@ public class Gui {
             
             int day = JOptionPane.showOptionDialog(panel, "Select a day:", "Which day?", 0, 3, null, options, options[0]);
             if (todo != null) addListItem(todo, DayOfWeek.of(day + 1)); 
+        }
+    };
+
+    private ActionListener editItem = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String todo;
         }
     };
 
