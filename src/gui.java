@@ -9,6 +9,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
+
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 
 
 
@@ -36,6 +40,13 @@ public class Gui {
         frame = new JFrame("GUI");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400);
+        try {
+            UIManager.setLookAndFeel(new FlatDarkLaf());
+        } catch (UnsupportedLookAndFeelException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
     }
 
     private void buildMenu() {
