@@ -76,12 +76,18 @@ public class Gui {
 
         
         if (checklistModel.getCurrDayOfWeek() == null) checklistModel.setDay(today);
-        day = new JLabel(checklistModel.getCurrDayOfWeek().toString());
+        day = new JLabel(checklistModel.getCurrDayOfWeek().toString(), SwingConstants.CENTER);
+        day.setPreferredSize(new Dimension(100, 30));
+        day.setMinimumSize(new Dimension(100, 30));
+        day.setMaximumSize(new Dimension(100, 30));
+
 
         JButton prev = new JButton("←");
         prev.addActionListener(decrementDate);
+        prev.setPreferredSize(new Dimension(80, 30));
         JButton next = new JButton("→");
         next.addActionListener(incrementDate);
+        next.setPreferredSize(new Dimension(80, 30));
         date.add(prev);
         date.add(day);
         date.add(next);
