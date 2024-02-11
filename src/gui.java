@@ -2,6 +2,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.DayOfWeek;
@@ -9,7 +11,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
@@ -23,6 +24,7 @@ public class Gui {
     private JMenuBar mb;
     private JMenu m1, m2;
     private JMenuItem mi1, mi2;
+    private JCheckBoxMenuItem mi3;
 
     private JFrame frame;
     
@@ -37,34 +39,31 @@ public class Gui {
     
 
     private void buildWindow() {
-        frame = new JFrame("GUI");
+        frame = new JFrame("To-Do List");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400);
-        try {
-            UIManager.setLookAndFeel(new FlatDarkLaf());
-        } catch (UnsupportedLookAndFeelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         
     }
 
     private void buildMenu() {
         mb = new JMenuBar();
         mb.setMaximumSize(new Dimension(400, 30));
-        m1 = new JMenu("FILE");
-        m2 = new JMenu("Help");
+        m1 = new JMenu("File");
+        m2 = new JMenu("Theme");
         mb.add(m1);
         mb.add(m2);
         mi1 = new JMenuItem("Add item");
         mi2 = new JMenuItem("Edit item");
-
+        mi3 = new JCheckBoxMenuItem("Dark mode", false);
         
         
         mi1.addActionListener(addItem);
 
+        mi3.addActionListener(toggleDark);
+
         m1.add(mi1);
         m1.add(mi2);
+        m2.add(mi3);
 
         frame.setJMenuBar(mb);
     }
@@ -143,23 +142,37 @@ public class Gui {
     }
 
     public Gui() {
-        buildWindow();
-
+        
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-
+        buildWindow();
+        
         buildMenu();
         buildDate();
         buildChecklist();
         buildAddButton();
 
+        
         //panel.add(mb);
         panel.add(date);
         panel.add(lp);
         panel.add(bp);
-
+        
         frame.getContentPane().add(panel);
         frame.setVisible(true);
+
+        
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (UnsupportedLookAndFeelException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        for (Frame frame : Frame.getFrames()) {
+            updateLAFRecursively(frame);
+        }
+        frame.revalidate();
+        frame.repaint();
     }
     public static void main(String args[]) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -179,8 +192,13 @@ public class Gui {
         public void actionPerformed(ActionEvent e) {
             String todo = JOptionPane.showInputDialog(panel, "Input an item", null);
             
-            int day = JOptionPane.showOptionDialog(panel, "Select a day:", "Which day?", 0, 3, null, options, options[0]);
-            if (todo != null) addListItem(todo, DayOfWeek.of(day + 1)); 
+            if (todo != null && todo.trim().length() != 0) {
+                int day = JOptionPane.showOptionDialog(panel, "Select a day:", "Which day?", 0, 3, null, options, options[0]);
+                addListItem(todo, DayOfWeek.of(day + 1)); 
+            }
+            else {
+                JOptionPane.showMessageDialog(panel, "Error: Item is empty", "Error", 0);
+            }
         }
     };
 
@@ -210,4 +228,33 @@ public class Gui {
             updateList();
         }
     };
+
+    private ActionListener toggleDark = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (mi3.getState()) {
+                    UIManager.setLookAndFeel(new FlatDarkLaf());
+                }
+                else {
+                    UIManager.setLookAndFeel(new FlatLightLaf());
+                }
+                for (Frame frame : Frame.getFrames()) {
+                    updateLAFRecursively(frame);
+                }
+                frame.revalidate();
+                frame.repaint();
+            } catch (UnsupportedLookAndFeelException er) {
+                // TODO Auto-generated catch block
+                er.printStackTrace();
+            }
+        }
+    };
+
+    public static void updateLAFRecursively(Window window) {
+        for (Window child : window.getOwnedWindows()) {
+            updateLAFRecursively(child);
+        }
+        SwingUtilities.updateComponentTreeUI(window);
+    }
 }
