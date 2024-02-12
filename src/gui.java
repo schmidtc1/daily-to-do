@@ -17,7 +17,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 
 
-public class Gui {
+public class gui {
 
     static String[] options = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
 
@@ -141,7 +141,7 @@ public class Gui {
         panel.repaint();
     }
 
-    public Gui() {
+    public gui() {
         
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
@@ -179,7 +179,7 @@ public class Gui {
             @Override
             public void run() {
                 try {
-                    new Gui();
+                    new gui();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
