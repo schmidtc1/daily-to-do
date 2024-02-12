@@ -25,6 +25,8 @@ public class gui {
     private JMenu m1, m2;
     private JMenuItem mi1, mi2;
     private JCheckBoxMenuItem mi3;
+    private JButton addItemButton;
+
 
     private JFrame frame;
     
@@ -58,7 +60,7 @@ public class gui {
         
         
         mi1.addActionListener(addItem);
-
+        mi2.addActionListener(editItem);
         mi3.addActionListener(toggleDark);
 
         m1.add(mi1);
@@ -105,7 +107,7 @@ public class gui {
     }
 
     private void buildAddButton() {
-        JButton addItemButton = new JButton("Add item");
+        addItemButton = new JButton("Add item");
         bp = new JPanel(new BorderLayout());
         bp.add(addItemButton);
         addItemButton.addActionListener(addItem);
@@ -119,6 +121,35 @@ public class gui {
             list.add(chk);
             list.revalidate();
         }
+    }
+
+    private void editList() {
+        Component[] cList = lp.getComponents();
+        for (Component c : cList) {
+            if (c instanceof JPanel) {
+                lp.remove(c);
+            }
+        }
+
+        list.removeAll();
+        List<Item> l = checklistModel.getList();
+        if (l != null) {
+            for (int i = 0; i < l.size(); i++) {
+                JTextField field = new JTextField(l.get(i).getText());
+                field.setMaximumSize(new Dimension(panel.getWidth(), l.get(i).getCheckbox().getHeight()));
+                list.add(field);
+            }
+        }
+        lp.add(list);
+        JButton doneButton = new JButton("Done");
+        doneButton.addActionListener(editingList);
+        bp.removeAll();
+        bp.add(doneButton);
+        
+        panel.revalidate();
+        panel.repaint();
+        
+        
     }
 
     private void updateList() {
@@ -205,7 +236,28 @@ public class gui {
     private ActionListener editItem = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String todo;
+            editList();
+        }
+    };
+
+    private ActionListener editingList = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Component[] cList = lp.getComponents();
+            for (Component c : cList) {
+                if (c instanceof JPanel) {
+                    lp.remove(c);
+                }
+            }
+            List<Item> l = checklistModel.getList();
+            for (int i = 0; i < l.size(); i++) {
+                if (list.getComponent(i) instanceof JTextField) {
+                    l.get(i).setCheckbox(new JCheckBox(((JTextField) list.getComponent(i)).getText()));
+                }
+            }
+            updateList();
+            bp.removeAll();
+            bp.add(addItemButton);
         }
     };
 
