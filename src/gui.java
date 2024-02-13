@@ -20,6 +20,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 public class gui {
 
     static String[] options = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
+    static int margins = 5;
+    static int frameWidth = 400, frameHeight = 400;
 
     private JMenuBar mb;
     private JMenu m1, m2;
@@ -27,6 +29,7 @@ public class gui {
     private JCheckBoxMenuItem mi3;
     private JButton addItemButton;
 
+    private boolean editMode = false;
 
     private JFrame frame;
     
@@ -43,13 +46,13 @@ public class gui {
     private void buildWindow() {
         frame = new JFrame("To-Do List");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 400);
+        frame.setSize(frameWidth, frameHeight);
         
     }
 
     private void buildMenu() {
         mb = new JMenuBar();
-        mb.setMaximumSize(new Dimension(400, 30));
+        mb.setMaximumSize(new Dimension(frameWidth, 30));
         m1 = new JMenu("File");
         m2 = new JMenu("Theme");
         mb.add(m1);
@@ -72,8 +75,8 @@ public class gui {
 
     private void buildDate() {
         date = new JPanel();
-        date.setMaximumSize(new Dimension(400, 40));
-        date.setBorder(BorderFactory.createLineBorder(Color.black));
+        date.setMaximumSize(new Dimension(frameWidth, 40));
+        date.setBorder(BorderFactory.createEmptyBorder(0, 0, margins, 0));
 
         
         if (checklistModel.getCurrDayOfWeek() == null) checklistModel.setDay(today);
@@ -100,21 +103,31 @@ public class gui {
         list = new JPanel();
         list.setLayout(new BoxLayout(list, BoxLayout.PAGE_AXIS));
         list.setBorder(BorderFactory.createLineBorder(Color.black));
-    
-        lp.add(list, BorderLayout.WEST);
-        list.setPreferredSize(new Dimension(400, 330));
+
+        // scrollPane = new JScrollPane(list);
+        // lp.setAutoscrolls(true);
+        // scrollPane.setPreferredSize(new Dimension(300, 330));
+        // scrollPane.setMaximumSize(scrollPane.getPreferredSize());
+        // lp.add(scrollPane, BorderLayout.CENTER);
+
+
+        lp.add(list, BorderLayout.CENTER);
+        list.setPreferredSize(new Dimension(frameWidth, 330));
 
     }
 
     private void buildAddButton() {
         addItemButton = new JButton("Add item");
         bp = new JPanel(new BorderLayout());
+        bp.setBorder(BorderFactory.createEmptyBorder(margins, 0, 0, 0));
         bp.add(addItemButton);
+        bp.setPreferredSize(new Dimension(frameWidth - 40, 50));
         addItemButton.addActionListener(addItem);
     }
 
     private void addListItem(String todo, DayOfWeek day) {
         JCheckBox chk = new JCheckBox(todo);
+        chk.setSize(frameWidth - 40, 20);
         checklistModel.add(day, new Item(todo, day, chk));
 
         if (day.equals(checklistModel.getCurrDayOfWeek())) {
@@ -136,20 +149,20 @@ public class gui {
         if (l != null) {
             for (int i = 0; i < l.size(); i++) {
                 JTextField field = new JTextField(l.get(i).getText());
-                field.setMaximumSize(new Dimension(panel.getWidth(), l.get(i).getCheckbox().getHeight()));
+                field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
                 list.add(field);
             }
         }
         lp.add(list);
         JButton doneButton = new JButton("Done");
-        doneButton.addActionListener(editingList);
+        doneButton.addActionListener(doneEditing);
         bp.removeAll();
         bp.add(doneButton);
         
         panel.revalidate();
         panel.repaint();
         
-        
+        editMode = true;
     }
 
     private void updateList() {
@@ -162,9 +175,20 @@ public class gui {
 
         list.removeAll();
         List<Item> l = checklistModel.getList();
-        if (l != null) {
-            for (int i = 0; i < l.size(); i++) {
-                list.add(l.get(i).getCheckbox());
+        if (editMode) {
+            if (l != null) {
+                for (int i = 0; i < l.size(); i++) {
+                    JTextField field = new JTextField(l.get(i).getText());
+                    field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
+                    list.add(field);
+                }
+            }
+        }
+        else {
+            if (l != null) {
+                for (int i = 0; i < l.size(); i++) {
+                    list.add(l.get(i).getCheckbox());
+                }
             }
         }
         lp.add(list);
@@ -176,6 +200,7 @@ public class gui {
         
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(margins, margins, margins, margins));
         buildWindow();
         
         buildMenu();
@@ -240,7 +265,7 @@ public class gui {
         }
     };
 
-    private ActionListener editingList = new ActionListener() {
+    private ActionListener doneEditing = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             Component[] cList = lp.getComponents();
@@ -250,14 +275,18 @@ public class gui {
                 }
             }
             List<Item> l = checklistModel.getList();
-            for (int i = 0; i < l.size(); i++) {
-                if (list.getComponent(i) instanceof JTextField) {
-                    l.get(i).setCheckbox(new JCheckBox(((JTextField) list.getComponent(i)).getText()));
+            if (l != null) {
+                for (int i = 0; i < l.size(); i++) {
+                    if (list.getComponent(i) instanceof JTextField) {
+                        l.get(i).setCheckbox(new JCheckBox(((JTextField) list.getComponent(i)).getText()));
+                    }
                 }
             }
+            editMode = false;
             updateList();
             bp.removeAll();
             bp.add(addItemButton);
+
         }
     };
 
