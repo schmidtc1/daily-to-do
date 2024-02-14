@@ -30,6 +30,7 @@ public class gui {
     private JMenuItem mi1, mi2;
     private JCheckBoxMenuItem mi3;
     private JButton addItemButton;
+    private JButton doneButton;
 
     private boolean editMode = false;
 
@@ -150,8 +151,7 @@ public class gui {
             }
         }
         lp.add(list);
-        JButton doneButton = new JButton("Done");
-        // doneButton.setFont(new Font("bold", Font.BOLD, 12));
+        doneButton = new JButton("Done");
         doneButton.setBackground(new Color(2, 48, 32));
         doneButton.addActionListener(doneEditing);
 
@@ -260,7 +260,14 @@ public class gui {
     private ActionListener editItem = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            editList();
+            if (editMode) {
+                for (ActionListener a : doneButton.getActionListeners()) {
+                    a.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+                }
+            }
+            else {
+                editList();
+            }
         }
     };
 
