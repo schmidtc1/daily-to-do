@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +21,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 public class gui {
 
     static String[] options = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
-    static int margins = 5;
+    static int panelMargins = 5;
+    static int topCheckMargin = 4, sideCheckMargin = 6;
     static int frameWidth = 400, frameHeight = 400;
 
     private JMenuBar mb;
@@ -76,7 +78,7 @@ public class gui {
     private void buildDate() {
         date = new JPanel();
         date.setMaximumSize(new Dimension(frameWidth, 40));
-        date.setBorder(BorderFactory.createEmptyBorder(0, 0, margins, 0));
+        date.setBorder(BorderFactory.createEmptyBorder(0, 0, panelMargins, 0));
 
         
         if (checklistModel.getCurrDayOfWeek() == null) checklistModel.setDay(today);
@@ -100,26 +102,19 @@ public class gui {
     private void buildChecklist() {
         lp = new JPanel();
         lp.setLayout(new BorderLayout());
+        lp.setBorder(BorderFactory.createEmptyBorder(panelMargins, panelMargins, panelMargins, panelMargins));
         list = new JPanel();
         list.setLayout(new BoxLayout(list, BoxLayout.PAGE_AXIS));
         list.setBorder(BorderFactory.createLineBorder(Color.black));
 
-        // scrollPane = new JScrollPane(list);
-        // lp.setAutoscrolls(true);
-        // scrollPane.setPreferredSize(new Dimension(300, 330));
-        // scrollPane.setMaximumSize(scrollPane.getPreferredSize());
-        // lp.add(scrollPane, BorderLayout.CENTER);
-
-
         lp.add(list, BorderLayout.CENTER);
         list.setPreferredSize(new Dimension(frameWidth, 330));
-
     }
 
     private void buildAddButton() {
         addItemButton = new JButton("Add item");
         bp = new JPanel(new BorderLayout());
-        bp.setBorder(BorderFactory.createEmptyBorder(margins, 0, 0, 0));
+        bp.setBorder(BorderFactory.createEmptyBorder(panelMargins, 0, 0, 0));
         bp.add(addItemButton);
         bp.setPreferredSize(new Dimension(frameWidth - 40, 50));
         addItemButton.addActionListener(addItem);
@@ -128,6 +123,7 @@ public class gui {
     private void addListItem(String todo, DayOfWeek day) {
         JCheckBox chk = new JCheckBox(todo);
         chk.setSize(frameWidth - 40, 20);
+        chk.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
         checklistModel.add(day, new Item(todo, day, chk));
 
         if (day.equals(checklistModel.getCurrDayOfWeek())) {
@@ -155,8 +151,11 @@ public class gui {
         }
         lp.add(list);
         JButton doneButton = new JButton("Done");
+        // doneButton.setFont(new Font("bold", Font.BOLD, 12));
+        doneButton.setBackground(new Color(2, 48, 32));
         doneButton.addActionListener(doneEditing);
-        bp.removeAll();
+
+        addItemButton.setVisible(false);
         bp.add(doneButton);
         
         panel.revalidate();
@@ -200,7 +199,7 @@ public class gui {
         
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(margins, margins, margins, margins));
+        panel.setBorder(BorderFactory.createEmptyBorder(panelMargins, panelMargins, panelMargins, panelMargins));
         buildWindow();
         
         buildMenu();
@@ -286,7 +285,7 @@ public class gui {
             updateList();
             bp.removeAll();
             bp.add(addItemButton);
-
+            addItemButton.setVisible(true);
         }
     };
 
@@ -310,6 +309,7 @@ public class gui {
         }
     };
 
+    /* Bug where edit's done button causes dark coloring of add button if theme is switched during edit mode. */
     private ActionListener toggleDark = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
