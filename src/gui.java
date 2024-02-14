@@ -92,9 +92,11 @@ public class gui {
         JButton prev = new JButton("←");
         prev.addActionListener(decrementDate);
         prev.setPreferredSize(new Dimension(80, 30));
+        prev.setBorder(BorderFactory.createLineBorder(Color.black));
         JButton next = new JButton("→");
         next.addActionListener(incrementDate);
         next.setPreferredSize(new Dimension(80, 30));
+        next.setBorder(BorderFactory.createLineBorder(Color.black));
         date.add(prev);
         date.add(day);
         date.add(next);
@@ -114,8 +116,11 @@ public class gui {
 
     private void buildAddButton() {
         addItemButton = new JButton("Add item");
+        //addItemButton.setBackground(new Color(0, 100, 0));
+        addItemButton.setBorder(BorderFactory.createLineBorder(Color.black));
+
         bp = new JPanel(new BorderLayout());
-        bp.setBorder(BorderFactory.createEmptyBorder(panelMargins, 0, 0, 0));
+        bp.setBorder(BorderFactory.createEmptyBorder(panelMargins, panelMargins, 0, panelMargins));
         bp.add(addItemButton);
         bp.setPreferredSize(new Dimension(frameWidth - 40, 50));
         addItemButton.addActionListener(addItem);
@@ -152,7 +157,7 @@ public class gui {
         }
         lp.add(list);
         doneButton = new JButton("Done");
-        doneButton.setBackground(new Color(2, 48, 32));
+        doneButton.setBackground(new Color(35, 127, 183));
         doneButton.addActionListener(doneEditing);
 
         addItemButton.setVisible(false);
@@ -284,7 +289,7 @@ public class gui {
             if (l != null) {
                 for (int i = 0; i < l.size(); i++) {
                     if (list.getComponent(i) instanceof JTextField) {
-                        l.get(i).setCheckbox(new JCheckBox(((JTextField) list.getComponent(i)).getText()));
+                        l.get(i).getCheckbox().setText(((JTextField) list.getComponent(i)).getText());
                     }
                 }
             }
@@ -316,7 +321,6 @@ public class gui {
         }
     };
 
-    /* Bug where edit's done button causes dark coloring of add button if theme is switched during edit mode. */
     private ActionListener toggleDark = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
