@@ -115,6 +115,7 @@ public class gui {
 
         lp.add(list, BorderLayout.CENTER);
         list.setPreferredSize(new Dimension(frameWidth, 330));
+
     }
 
     private void buildAddButton() {
@@ -187,7 +188,7 @@ public class gui {
                 JTextField field = new JTextField(l.get(i).getText());
                 field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
                 field.setEditable(false);
-                JButton del = new JButton("X");
+                JCheckBox del = new JCheckBox();
                 JPanel delPanel = new JPanel();
                 delPanel.setLayout(new BoxLayout(delPanel, BoxLayout.LINE_AXIS));
                 delPanel.add(del);
