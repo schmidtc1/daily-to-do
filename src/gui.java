@@ -143,13 +143,6 @@ public class gui {
     }
 
     private void editList() {
-        Component[] cList = lp.getComponents();
-        for (Component c : cList) {
-            if (c instanceof JPanel) {
-                lp.remove(c);
-            }
-        }
-
         list.removeAll();
         List<Item> l = checklistModel.getList();
         if (l != null) {
@@ -174,13 +167,6 @@ public class gui {
     }
 
     private void deleteList() {
-        Component[] cList = lp.getComponents();
-        for (Component c : cList) {
-            if (c instanceof JPanel) {
-                lp.remove(c);
-            }
-        }
-
         list.removeAll();
         List<Item> l = checklistModel.getList();
         if (l != null) {
@@ -211,26 +197,30 @@ public class gui {
     }
 
     private void updateList() {
-        Component[] cList = lp.getComponents();
-        for (Component c : cList) {
-            if (c instanceof JPanel) {
-                lp.remove(c);
-            }
-        }
-
         list.removeAll();
         List<Item> l = checklistModel.getList();
-        if (editMode) {
-            if (l != null) {
+        if (l != null) {
+            if (editMode) {
                 for (int i = 0; i < l.size(); i++) {
                     JTextField field = new JTextField(l.get(i).getText());
                     field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
                     list.add(field);
                 }
             }
-        }
-        else {
-            if (l != null) {
+            else if (deleteMode) {
+                for (int i = 0; i < l.size(); i++) {
+                    JTextField field = new JTextField(l.get(i).getText());
+                    field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
+                    field.setEditable(false);
+                    JCheckBox del = new JCheckBox();
+                    JPanel delPanel = new JPanel();
+                    delPanel.setLayout(new BoxLayout(delPanel, BoxLayout.LINE_AXIS));
+                    delPanel.add(del);
+                    delPanel.add(field);
+                    list.add(delPanel);
+                }
+            }
+            else {
                 for (int i = 0; i < l.size(); i++) {
                     list.add(l.get(i).getCheckbox());
                 }
@@ -333,17 +323,12 @@ public class gui {
     private ActionListener doneEditing = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Component[] cList = lp.getComponents();
-            for (Component c : cList) {
-                if (c instanceof JPanel) {
-                    lp.remove(c);
-                }
-            }
             List<Item> l = checklistModel.getList();
             if (l != null) {
                 for (int i = 0; i < l.size(); i++) {
                     if (list.getComponent(i) instanceof JTextField) {
                         l.get(i).getCheckbox().setText(((JTextField) list.getComponent(i)).getText());
+
                     }
                 }
             }
@@ -358,17 +343,18 @@ public class gui {
     private ActionListener doneDeleting = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Component[] cList = lp.getComponents();
-            for (Component c : cList) {
-                if (c instanceof JPanel) {
-                    lp.remove(c);
-                }
-            }
             List<Item> l = checklistModel.getList();
             if (l != null) {
                 for (int i = 0; i < l.size(); i++) {
-                    if (list.getComponent(i) instanceof JTextField) {
-                        l.get(i).getCheckbox().setText(((JTextField) list.getComponent(i)).getText());
+                    if (list.getComponent(i) instanceof JPanel) {
+                        for (Component c : ((JPanel) list.getComponent(i)).getComponents()) {
+                            if (c instanceof JCheckBox) {
+                                if (((JCheckBox) c).isSelected()) {
+                                    checklistModel.remove(i);
+                                    i--;
+                                }
+                            }
+                        }
                     }
                 }
             }

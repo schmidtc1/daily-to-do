@@ -31,6 +31,10 @@ public class ChecklistModel extends AbstractListModel<Item> {
         this.fireContentsChanged(this, getSize() - 1, getSize() - 1);
     }
 
+    public void remove(int index) {
+        this.list.getList(curr).remove(index);
+    }
+
     public void updateTheme() {
         for (int i = 1; i <= DayOfWeek.values().length; i++) {
             List<Item> l = this.list.getList(DayOfWeek.of(i));
