@@ -184,7 +184,7 @@ public class gui {
         }
         lp.add(list);
         deleteButton = new JButton("Delete");
-        deleteButton.setBackground(Color.RED);
+        deleteButton.setBackground(new Color(210, 43, 43));
         deleteButton.addActionListener(doneDeleting);
 
         addItemButton.setVisible(false);
@@ -281,14 +281,22 @@ public class gui {
     private ActionListener addItem = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String todo = JOptionPane.showInputDialog(panel, "Input an item", null);
-            
-            if (todo != null && todo.trim().length() != 0) {
-                int day = JOptionPane.showOptionDialog(panel, "Select a day:", "Which day?", 0, 3, null, options, options[0]);
-                addListItem(todo, DayOfWeek.of(day + 1)); 
+            if (editMode) {
+                JOptionPane.showMessageDialog(panel, "Cannot add items while editing them.", "Error", 0);
+            }
+            else if (deleteMode) {
+                JOptionPane.showMessageDialog(panel, "Cannot add items while deleting them", "Error", 0);
             }
             else {
-                JOptionPane.showMessageDialog(panel, "Error: Item is empty", "Error", 0);
+                String todo = JOptionPane.showInputDialog(panel, "Input an item", null);
+                
+                if (todo != null && todo.trim().length() != 0) {
+                    int day = JOptionPane.showOptionDialog(panel, "Select a day:", "Which day?", 0, 3, null, options, options[0]);
+                    addListItem(todo, DayOfWeek.of(day + 1)); 
+                }
+                else {
+                    JOptionPane.showMessageDialog(panel, "Error: Item is empty", "Error", 0);
+                }
             }
         }
     };
@@ -300,6 +308,9 @@ public class gui {
                 for (ActionListener a : doneButton.getActionListeners()) {
                     a.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
                 }
+            }
+            else if (deleteMode) {
+                JOptionPane.showMessageDialog(panel, "Cannot edit items while deleting them.", "Error", 0);
             }
             else {
                 editList();
@@ -313,6 +324,9 @@ public class gui {
                 for (ActionListener a : deleteButton.getActionListeners()) {
                     a.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
                 }
+            }
+            else if (editMode) {
+                JOptionPane.showMessageDialog(panel, "Cannot delete items while editing them.", "Error", 0);
             }
             else {
                 deleteList();
