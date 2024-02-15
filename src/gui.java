@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.io.*;
 
 import javax.swing.*;
 
@@ -49,7 +50,6 @@ public class gui {
         frame = new JFrame("To-Do List");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(frameWidth, frameHeight);
-        
     }
 
     private void buildMenu() {
@@ -231,6 +231,69 @@ public class gui {
         panel.repaint();
     }
 
+    private void writeFile() {
+        FileWriter save;
+        try {
+            save = new FileWriter("sav/sav.txt");
+            BufferedWriter buffer = new BufferedWriter(save);
+            for (int i = 1; i <= DayOfWeek.values().length; i++) {
+                List<Item> l = checklistModel.getListByDay(DayOfWeek.of(i));
+                if (l != null) {
+                    for (int j = 0; j < l.size(); j++) {
+                        String text = l.get(j).getText();
+                        boolean checked = l.get(j).getCheckbox().isSelected();
+                        buffer.write(Integer.toString(i));
+                        buffer.newLine();
+                        buffer.write(text);
+                        buffer.newLine();
+                        if (checked) buffer.write("TRUE");
+                        else buffer.write("FALSE");
+                        buffer.newLine();
+                    }
+                }
+            }
+            buffer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+
+    }
+
+    /*
+     * SAVE FILE STRUCTURE
+     * 
+     * DAY
+     * String - Item text
+     * Boolean - Item checked or not
+     * repeat for every item in the list
+     * repeat for every day of the week
+     */
+
+     private void readFile() {
+        FileReader save;
+        try {
+            save = new FileReader("sav/sav.txt");
+            BufferedReader buffer = new BufferedReader(save);
+            
+            String day = buffer.readLine();
+            while (day != null) {
+                String text = buffer.readLine();
+                boolean checked = Boolean.valueOf(buffer.readLine());
+                JCheckBox chk = new JCheckBox(text);
+                chk.setSize(frameWidth - 40, 20);
+                chk.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
+                chk.setSelected(checked);
+                checklistModel.add(DayOfWeek.of(Integer.parseInt(day)), new Item(text, DayOfWeek.of(Integer.parseInt(day)), chk));
+                day = buffer.readLine();
+            }
+            buffer.close();
+            updateList();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+     }
+
     public gui() {
         
         panel = new JPanel();
@@ -248,6 +311,8 @@ public class gui {
         panel.add(date);
         panel.add(lp);
         panel.add(bp);
+
+        readFile();
         
         frame.getContentPane().add(panel);
         frame.setVisible(true);
@@ -266,16 +331,38 @@ public class gui {
         frame.repaint();
     }
     public static void main(String args[]) {
+        // try {
+        //     FileReader save = new FileReader("sav/sav.txt");
+        //     BufferedReader buffer = new BufferedReader(save);
+        //     String line = buffer.readLine();
+        //     while (line != null) {
+        //         System.out.println(line);
+        //         line = buffer.readLine();
+        //     }
+        //     buffer.close();
+        // } catch (FileNotFoundException e) {
+        //     e.printStackTrace();
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
+        
+
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
-                    new gui();
+                    gui g = new gui();
+                    Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                        public void run() {
+                            g.writeFile();
+                        }
+                    }));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
+
     }
 
     private ActionListener addItem = new ActionListener() {

@@ -8,6 +8,7 @@ The workspace contains two folders by default, where:
 
 - `src`: the folder to maintain sources
 - `lib`: the folder to maintain dependencies (NOTE: you may need to create a lib folder yourself)
+- `sav`: the folder to maintain save data for checklist items (NOTE: there will be a pre-existing sav.txt file as a template)
 
 Meanwhile, the compiled output files will be generated in the `bin` folder by default.
 

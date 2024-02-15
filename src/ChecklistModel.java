@@ -50,6 +50,10 @@ public class ChecklistModel extends AbstractListModel<Item> {
         return this.list.getList(curr);
     }
 
+    public List<Item> getListByDay(DayOfWeek day) {
+        return this.list.getList(day);
+    }
+
     @Override
     public int getSize() {
         return this.list.size();
