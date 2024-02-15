@@ -27,12 +27,11 @@ public class gui {
 
     private JMenuBar mb;
     private JMenu m1, m2;
-    private JMenuItem mi1, mi2;
-    private JCheckBoxMenuItem mi3;
-    private JButton addItemButton;
-    private JButton doneButton;
+    private JMenuItem mi1, mi2, mi3;
+    private JCheckBoxMenuItem mi4;
+    private JButton addItemButton, doneButton, deleteButton;
 
-    private boolean editMode = false;
+    private boolean editMode = false, deleteMode = false;
 
     private JFrame frame;
     
@@ -62,16 +61,20 @@ public class gui {
         mb.add(m2);
         mi1 = new JMenuItem("Add item");
         mi2 = new JMenuItem("Edit item");
-        mi3 = new JCheckBoxMenuItem("Dark mode", false);
+        mi3 = new JMenuItem("Delete item");
+        mi4 = new JCheckBoxMenuItem("Dark mode", false);
         
         
         mi1.addActionListener(addItem);
         mi2.addActionListener(editItem);
-        mi3.addActionListener(toggleDark);
+        mi3.addActionListener(deleteItem);
+
+        mi4.addActionListener(toggleDark);
 
         m1.add(mi1);
         m1.add(mi2);
-        m2.add(mi3);
+        m1.add(mi3);
+        m2.add(mi4);
 
         frame.setJMenuBar(mb);
     }
@@ -167,6 +170,43 @@ public class gui {
         panel.repaint();
         
         editMode = true;
+    }
+
+    private void deleteList() {
+        Component[] cList = lp.getComponents();
+        for (Component c : cList) {
+            if (c instanceof JPanel) {
+                lp.remove(c);
+            }
+        }
+
+        list.removeAll();
+        List<Item> l = checklistModel.getList();
+        if (l != null) {
+            for (int i = 0; i < l.size(); i++) {
+                JTextField field = new JTextField(l.get(i).getText());
+                field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
+                field.setEditable(false);
+                JButton del = new JButton("X");
+                JPanel delPanel = new JPanel();
+                delPanel.setLayout(new BoxLayout(delPanel, BoxLayout.LINE_AXIS));
+                delPanel.add(del);
+                delPanel.add(field);
+                list.add(delPanel);
+            }
+        }
+        lp.add(list);
+        deleteButton = new JButton("Delete");
+        deleteButton.setBackground(Color.RED);
+        deleteButton.addActionListener(doneDeleting);
+
+        addItemButton.setVisible(false);
+        bp.add(deleteButton);
+        
+        panel.revalidate();
+        panel.repaint();
+        
+        deleteMode = true;
     }
 
     private void updateList() {
@@ -275,6 +315,19 @@ public class gui {
             }
         }
     };
+    private ActionListener deleteItem = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (deleteMode) {
+                for (ActionListener a : deleteButton.getActionListeners()) {
+                    a.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+                }
+            }
+            else {
+                deleteList();
+            }
+        }
+    };
 
     private ActionListener doneEditing = new ActionListener() {
         @Override
@@ -294,6 +347,31 @@ public class gui {
                 }
             }
             editMode = false;
+            updateList();
+            bp.removeAll();
+            bp.add(addItemButton);
+            addItemButton.setVisible(true);
+        }
+    };
+
+    private ActionListener doneDeleting = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Component[] cList = lp.getComponents();
+            for (Component c : cList) {
+                if (c instanceof JPanel) {
+                    lp.remove(c);
+                }
+            }
+            List<Item> l = checklistModel.getList();
+            if (l != null) {
+                for (int i = 0; i < l.size(); i++) {
+                    if (list.getComponent(i) instanceof JTextField) {
+                        l.get(i).getCheckbox().setText(((JTextField) list.getComponent(i)).getText());
+                    }
+                }
+            }
+            deleteMode = false;
             updateList();
             bp.removeAll();
             bp.add(addItemButton);
@@ -325,7 +403,7 @@ public class gui {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                if (mi3.getState()) {
+                if (mi4.getState()) {
                     UIManager.setLookAndFeel(new FlatDarkLaf());
                 }
                 else {
@@ -334,6 +412,9 @@ public class gui {
                 for (Frame frame : Frame.getFrames()) {
                     updateLAFRecursively(frame);
                 }
+
+                checklistModel.updateTheme();
+
                 frame.revalidate();
                 frame.repaint();
             } catch (UnsupportedLookAndFeelException er) {
