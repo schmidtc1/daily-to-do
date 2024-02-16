@@ -274,21 +274,23 @@ public class gui {
         FileReader save;
         try {
             save = new FileReader("sav/sav.txt");
-            BufferedReader buffer = new BufferedReader(save);
-            
-            String day = buffer.readLine();
-            while (day != null) {
-                String text = buffer.readLine();
-                boolean checked = Boolean.valueOf(buffer.readLine());
-                JCheckBox chk = new JCheckBox(text);
-                chk.setSize(frameWidth - 40, 20);
-                chk.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
-                chk.setSelected(checked);
-                checklistModel.add(DayOfWeek.of(Integer.parseInt(day)), new Item(text, DayOfWeek.of(Integer.parseInt(day)), chk));
-                day = buffer.readLine();
+            if (save != null) {
+                BufferedReader buffer = new BufferedReader(save);
+                
+                String day = buffer.readLine();
+                while (day != null) {
+                    String text = buffer.readLine();
+                    boolean checked = Boolean.valueOf(buffer.readLine());
+                    JCheckBox chk = new JCheckBox(text);
+                    chk.setSize(frameWidth - 40, 20);
+                    chk.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
+                    chk.setSelected(checked);
+                    checklistModel.add(DayOfWeek.of(Integer.parseInt(day)), new Item(text, DayOfWeek.of(Integer.parseInt(day)), chk));
+                    day = buffer.readLine();
+                }
+                buffer.close();
+                updateList();
             }
-            buffer.close();
-            updateList();
         } catch (IOException e) {
             System.out.println(e);
         }
@@ -331,22 +333,6 @@ public class gui {
         frame.repaint();
     }
     public static void main(String args[]) {
-        // try {
-        //     FileReader save = new FileReader("sav/sav.txt");
-        //     BufferedReader buffer = new BufferedReader(save);
-        //     String line = buffer.readLine();
-        //     while (line != null) {
-        //         System.out.println(line);
-        //         line = buffer.readLine();
-        //     }
-        //     buffer.close();
-        // } catch (FileNotFoundException e) {
-        //     e.printStackTrace();
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
-        
-
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
