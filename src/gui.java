@@ -292,7 +292,7 @@ public class gui {
                 updateList();
             }
         } catch (IOException e) {
-            System.out.println(e);
+            System.out.println("File not found, no save data will be loaded.");
         }
      }
 
