@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -40,6 +42,7 @@ public class gui {
     private DayOfWeek today = LocalDate.now().getDayOfWeek();
 
     private JPanel panel, date, lp, list, bp;
+    private JScrollPane scrollPane;
 
     private Checklist checklist = new Checklist();
     private ChecklistModel checklistModel = new ChecklistModel(this.checklist);
@@ -111,10 +114,22 @@ public class gui {
         lp.setBorder(BorderFactory.createEmptyBorder(panelMargins, panelMargins, panelMargins, panelMargins));
         list = new JPanel();
         list.setLayout(new BoxLayout(list, BoxLayout.PAGE_AXIS));
-        list.setBorder(BorderFactory.createLineBorder(Color.black));
-
+        //list.setBorder(BorderFactory.createLineBorder(Color.black));
+        
+        
+        // scrollPane = new JScrollPane(list);
+        // scrollPane.setPreferredSize(new Dimension(frameWidth, 240));
+        // scrollPane.setMinimumSize(new Dimension(frameWidth, 240));
+        // scrollPane.setMaximumSize(new Dimension(frameWidth, 240));
         lp.add(list, BorderLayout.CENTER);
-        list.setPreferredSize(new Dimension(frameWidth, 330));
+        lp.setPreferredSize(new Dimension(frameWidth, 260));
+        lp.setMinimumSize(new Dimension(frameWidth, 260));
+        lp.setMaximumSize(new Dimension(frameWidth, 260));
+        scrollPane = new JScrollPane(lp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(new Dimension(frameWidth, 260));
+        scrollPane.setMinimumSize(new Dimension(frameWidth, 260));
+        scrollPane.setMaximumSize(new Dimension(frameWidth, 260));
+
 
     }
 
@@ -126,7 +141,7 @@ public class gui {
         bp = new JPanel(new BorderLayout());
         bp.setBorder(BorderFactory.createEmptyBorder(panelMargins, panelMargins, 0, panelMargins));
         bp.add(addItemButton);
-        bp.setPreferredSize(new Dimension(frameWidth - 40, 50));
+        bp.setPreferredSize(new Dimension(frameWidth - 40, 80));
         addItemButton.addActionListener(addItem);
     }
 
@@ -153,6 +168,7 @@ public class gui {
             }
         }
         lp.add(list);
+        //scrollPane.add(list);
         doneButton = new JButton("Done");
         doneButton.setBackground(new Color(35, 127, 183));
         doneButton.addActionListener(doneEditing);
@@ -183,6 +199,7 @@ public class gui {
             }
         }
         lp.add(list);
+        //scrollPane.add(list);
         deleteButton = new JButton("Delete");
         deleteButton.setBackground(new Color(210, 43, 43));
         deleteButton.addActionListener(doneDeleting);
@@ -227,6 +244,7 @@ public class gui {
             }
         }
         lp.add(list);
+        //scrollPane.add(list);
         panel.revalidate();
         panel.repaint();
     }
@@ -299,7 +317,10 @@ public class gui {
     public gui() {
         
         panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridwidth = 1;
+        c.gridheight = 3;
         panel.setBorder(BorderFactory.createEmptyBorder(panelMargins, panelMargins, panelMargins, panelMargins));
         buildWindow();
         
@@ -310,9 +331,22 @@ public class gui {
 
         
         //panel.add(mb);
-        panel.add(date);
-        panel.add(lp);
-        panel.add(bp);
+        c.weightx = 1.0;
+        c.gridwidth = 3;
+        c.gridx = 1;
+        c.gridy = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(date, c);
+        c.weightx = 0.0;
+        c.weighty = 0.5;
+        c.ipady = 0;
+        c.gridy = 2;
+        panel.add(scrollPane, c);
+        c.weighty = 0.5;
+        c.ipady = 25;
+        c.gridy = 3;
+        c.anchor = GridBagConstraints.LAST_LINE_START;
+        panel.add(bp, c);
 
         readFile();
         
@@ -329,6 +363,7 @@ public class gui {
         for (Frame frame : Frame.getFrames()) {
             updateLAFRecursively(frame);
         }
+        checklistModel.updateTheme();
         frame.revalidate();
         frame.repaint();
     }
