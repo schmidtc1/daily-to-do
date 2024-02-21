@@ -15,6 +15,7 @@ import java.util.List;
 import java.io.*;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
@@ -111,21 +112,17 @@ public class gui {
     private void buildChecklist() {
         lp = new JPanel();
         lp.setLayout(new BorderLayout());
-        lp.setBorder(BorderFactory.createEmptyBorder(panelMargins, panelMargins, panelMargins, panelMargins));
+        //lp.setBorder(BorderFactory.createEmptyBorder(panelMargins, panelMargins, panelMargins, panelMargins));
         list = new JPanel();
         list.setLayout(new BoxLayout(list, BoxLayout.PAGE_AXIS));
-        //list.setBorder(BorderFactory.createLineBorder(Color.black));
         
         
-        // scrollPane = new JScrollPane(list);
-        // scrollPane.setPreferredSize(new Dimension(frameWidth, 240));
-        // scrollPane.setMinimumSize(new Dimension(frameWidth, 240));
-        // scrollPane.setMaximumSize(new Dimension(frameWidth, 240));
         lp.add(list, BorderLayout.CENTER);
-        lp.setPreferredSize(new Dimension(frameWidth, 260));
-        lp.setMinimumSize(new Dimension(frameWidth, 260));
-        lp.setMaximumSize(new Dimension(frameWidth, 260));
         scrollPane = new JScrollPane(lp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(new CompoundBorder(
+            BorderFactory.createEmptyBorder(panelMargins, panelMargins, panelMargins, panelMargins), 
+            BorderFactory.createLineBorder(Color.black)));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(frameHeight / (panelMargins * 5));
         scrollPane.setPreferredSize(new Dimension(frameWidth, 260));
         scrollPane.setMinimumSize(new Dimension(frameWidth, 260));
         scrollPane.setMaximumSize(new Dimension(frameWidth, 260));
