@@ -534,8 +534,16 @@ public class gui {
                     if (list.getComponent(i) instanceof JPanel) {
                         if (p == list.getComponent(i)) {
                             String s = JOptionPane.showInputDialog(panel, "Input an item", checklistModel.getElementAt(i).getText());
-                            checklistModel.getElementAt(i).setText(s);;
-                            break;
+                            if (s == null) {
+                                break;
+                            }
+                            else if (s.trim().length() == 0) {
+                                JOptionPane.showMessageDialog(panel, "Error: Item is empty", "Error", 0);
+                            }
+                            else {
+                                checklistModel.getElementAt(i).setText(s);
+                                break;
+                            }
                         }
                     }
                 }
