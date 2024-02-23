@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -37,7 +38,9 @@ public class gui {
     private JMenuItem mi1, mi2, mi3;
     private JCheckBoxMenuItem mi4;
     private JButton addItemButton, doneButton, deleteButton;
-    private ImageIcon icon = new ImageIcon("./img/delete.png", "Delete icon");
+    private ImageIcon deleteIcon = new ImageIcon("./img/delete.png", "Delete icon");
+    private ImageIcon editIcon = new ImageIcon("./img/edit.png", "Edit icon");
+
 
     private boolean editMode = false, deleteMode = false;
 
@@ -163,11 +166,27 @@ public class gui {
         List<Item> l = checklistModel.getList();
         if (l != null) {
             for (int i = 0; i < l.size(); i++) {
+                // JTextField field = new JTextField(l.get(i).getText());
+                // field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
+                // //field.setSize(frameWidth - 40, 20);
+                // field.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
+                // list.add(field);
                 JTextField field = new JTextField(l.get(i).getText());
                 field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
-                //field.setSize(frameWidth - 40, 20);
                 field.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
-                list.add(field);
+                field.setEditable(false);
+                field.setBorder(BorderFactory.createEmptyBorder());
+                // JCheckBox delChk = new JCheckBox();
+                JPanel editPanel = new JPanel();
+                JButton editB = new JButton(new ImageIcon(editIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH)));
+                editB.setBorder(BorderFactory.createEmptyBorder(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
+                editB.setContentAreaFilled(false);
+                editB.addActionListener(edit);
+                editB.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.LINE_AXIS));
+                editPanel.add(editB);
+                editPanel.add(field);
+                list.add(editPanel);
             }
         }
         lp.add(list);
@@ -199,10 +218,11 @@ public class gui {
                 field.setBorder(BorderFactory.createEmptyBorder());
                 // JCheckBox delChk = new JCheckBox();
                 JPanel delPanel = new JPanel();
-                JButton del = new JButton(new ImageIcon(icon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH)));
+                JButton del = new JButton(new ImageIcon(deleteIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH)));
                 del.setBorder(BorderFactory.createEmptyBorder(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
                 del.setContentAreaFilled(false);
                 del.addActionListener(delete);
+                del.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 delPanel.setLayout(new BoxLayout(delPanel, BoxLayout.LINE_AXIS));
                 delPanel.add(del);
                 delPanel.add(field);
@@ -230,9 +250,24 @@ public class gui {
         if (l != null) {
             if (editMode) {
                 for (int i = 0; i < l.size(); i++) {
+                    // JTextField field = new JTextField(l.get(i).getText());
+                    // field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
+                    // list.add(field);
                     JTextField field = new JTextField(l.get(i).getText());
                     field.setMaximumSize(new Dimension(frameWidth, l.get(i).getCheckbox().getHeight()));
-                    list.add(field);
+                    field.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
+                    field.setEditable(false);
+                    field.setBorder(BorderFactory.createEmptyBorder());
+                    JPanel editPanel = new JPanel();
+                    JButton editB = new JButton(new ImageIcon(editIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH)));
+                    editB.setBorder(BorderFactory.createEmptyBorder(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
+                    editB.setContentAreaFilled(false);
+                    editB.addActionListener(edit);
+                    editB.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.LINE_AXIS));
+                    editPanel.add(editB);
+                    editPanel.add(field);
+                    list.add(editPanel);
                 }
             }
             else if (deleteMode) {
@@ -252,9 +287,8 @@ public class gui {
                     field.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
                     field.setEditable(false);
                     field.setBorder(BorderFactory.createEmptyBorder());
-                    // JCheckBox delChk = new JCheckBox();
                     JPanel delPanel = new JPanel();
-                    JButton del = new JButton(new ImageIcon(icon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH)));
+                    JButton del = new JButton(new ImageIcon(deleteIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH)));
                     del.setBorder(BorderFactory.createEmptyBorder(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
                     del.setContentAreaFilled(false);
                     del.addActionListener(delete);
@@ -489,6 +523,28 @@ public class gui {
         }
     };
 
+    private ActionListener edit = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            List<Item> l = checklistModel.getList();
+            if (l != null) {
+                JButton b = (JButton) e.getSource();
+                JPanel p = (JPanel) b.getParent();
+                for (int i = 0; i < l.size(); i++) {
+                    if (list.getComponent(i) instanceof JPanel) {
+                        if (p == list.getComponent(i)) {
+                            String s = JOptionPane.showInputDialog(panel, "Input an item", checklistModel.getElementAt(i).getText());
+                            checklistModel.getElementAt(i).setText(s);;
+                            break;
+                        }
+                    }
+                }
+            }
+            updateList();
+
+        }
+    };
+
     private ActionListener doneDeleting = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -516,6 +572,7 @@ public class gui {
             addItemButton.setVisible(true);
         }
     };
+
     private ActionListener delete = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -528,7 +585,6 @@ public class gui {
                         if (p == list.getComponent(i)) {
                             checklistModel.remove(i);
                             list.remove(i);
-                            i--;
                             break;
                         }
                     }
