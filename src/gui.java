@@ -11,6 +11,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.io.*;
+import java.sql.*;
 
 import javax.swing.*;
 
@@ -333,6 +334,48 @@ public class gui {
         frame.repaint();
     }
     public static void main(String args[]) {
+        // try {
+        //     // The newInstance() call is a work around for some
+        //     // broken Java implementations
+        //     Class.forName("com.sqlite.JDBC");
+        //   } catch (Exception ex) {
+        //     // handle the error
+        //     ex.printStackTrace();
+        //   }
+
+        Connection conn = null;
+        String createTable = "CREATE TABLE IF NOT EXISTS checklist (\n" 
+            + " id integer PRIMARY KEY,\n"
+            + " name text NOT NULL\n" 
+            + ");";
+        try {
+            conn = DriverManager.getConnection("jdbc:sqlite:sav/sav.db");
+            // Get a connection to database
+            if (conn != null) {
+                DatabaseMetaData meta = conn.getMetaData();
+                System.out.println("The driver name is " + meta.getDriverName());
+                System.out.println("A new database has been created.");
+                Statement s = conn.createStatement();
+                s.execute(createTable);
+            }
+            // Create a statement
+
+            // Execute SQLite query
+
+            // Process the result set
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
