@@ -297,6 +297,102 @@ public class gui {
         }
      }
 
+     private void writeDB() {
+        Connection conn = null;
+        // String query = "CREATE TABLE IF NOT EXISTS checklist (\n" 
+        //     + " id integer PRIMARY KEY,\n"
+        //     + " name text NOT NULL\n" 
+        //     + ");";
+        String drop = "DROP TABLE IF EXISTS checklist;";
+        String query = "CREATE TABLE IF NOT EXISTS checklist (\n"
+            + " day INTEGER CHECK (day > 0 AND day < 8),\n"
+            + " name TEXT,\n"
+            + " checked BOOLEAN NOT NULL CHECK (checked IN (0, 1)),"
+            + " PRIMARY KEY (day, name));";
+        String insert = "INSERT INTO checklist(day, name, checked) VALUES(?, ?, ?)";
+        try {
+            // Get a connection to database
+            conn = DriverManager.getConnection("jdbc:sqlite:sav/sav.db");
+            // Create a statement
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(drop);
+            stmt.execute(query);
+            PreparedStatement pstmt = conn.prepareStatement(insert);
+            // Execute SQLite query
+            
+            // Process the result set
+
+            for (int i = 1; i <= DayOfWeek.values().length; i++) {
+                List<Item> l = checklistModel.getListByDay(DayOfWeek.of(i));
+                if (l != null) {
+                    for (int j = 0; j < l.size(); j++) {
+                        String text = l.get(j).getText();
+                        boolean checked = l.get(j).getCheckbox().isSelected();
+                        pstmt.setInt(1, i);
+                        pstmt.setString(2, text);
+                        pstmt.setBoolean(3, checked);
+                        pstmt.executeUpdate();
+                    }
+                }
+            }
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+     }
+
+     private void readDB() {
+        Connection conn = null;
+        // String query = "CREATE TABLE IF NOT EXISTS checklist (\n" 
+        //     + " id integer PRIMARY KEY,\n"
+        //     + " name text NOT NULL\n" 
+        //     + ");";
+        String query = "SELECT day, name, checked FROM checklist;";
+        try {
+            // Get a connection to database
+            conn = DriverManager.getConnection("jdbc:sqlite:sav/sav.db");
+            // Create a statement
+            Statement stmt = conn.createStatement();
+            // Execute SQLite query
+            ResultSet res = stmt.executeQuery(query);
+            // Process the result set
+            while (res.next()) {
+                System.out.println(res.getInt("day") + ", " + res.getString("name") + ", " + res.getBoolean("checked"));
+                int day = res.getInt("day");
+                String text = res.getString("name");
+                boolean checked = res.getBoolean("checked");
+                JCheckBox chk = new JCheckBox(text);
+                chk.setSize(frameWidth - 40, 20);
+                chk.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
+                chk.setSelected(checked);
+                checklistModel.add(DayOfWeek.of(day), new Item(text, DayOfWeek.of(day), chk));
+            }
+            updateList();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+     }
+
     public gui() {
         
         panel = new JPanel();
@@ -315,7 +411,9 @@ public class gui {
         panel.add(lp);
         panel.add(bp);
 
-        readFile();
+        //readFile();
+        //writeDB();
+        readDB();
         
         frame.getContentPane().add(panel);
         frame.setVisible(true);
@@ -343,39 +441,7 @@ public class gui {
         //     ex.printStackTrace();
         //   }
 
-        Connection conn = null;
-        String createTable = "CREATE TABLE IF NOT EXISTS checklist (\n" 
-            + " id integer PRIMARY KEY,\n"
-            + " name text NOT NULL\n" 
-            + ");";
-        try {
-            conn = DriverManager.getConnection("jdbc:sqlite:sav/sav.db");
-            // Get a connection to database
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("The driver name is " + meta.getDriverName());
-                System.out.println("A new database has been created.");
-                Statement s = conn.createStatement();
-                s.execute(createTable);
-            }
-            // Create a statement
-
-            // Execute SQLite query
-
-            // Process the result set
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -383,7 +449,8 @@ public class gui {
                     gui g = new gui();
                     Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                         public void run() {
-                            g.writeFile();
+                            // g.writeFile();
+                            g.writeDB();
                         }
                     }));
                 } catch (Exception e) {
