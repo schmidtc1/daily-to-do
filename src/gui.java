@@ -16,7 +16,7 @@ import java.awt.event.MouseEvent;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.io.*;
+import java.sql.*;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -310,68 +310,100 @@ public class gui {
         panel.repaint();
     }
 
-    private void writeFile() {
-        FileWriter save;
+     private void writeDB() {
+        Connection conn = null;
+        // Initialize statement strings
+        /* PROBLEM:
+         * Currently using DROP TABLE as a crutch to update/overwrite checklist with no duplicates.
+         * Think of inputting some sort of ID for each checklist item instead.
+         */
+        String drop = "DROP TABLE IF EXISTS checklist;";
+        String query = "CREATE TABLE IF NOT EXISTS checklist (\n"
+            + " day INTEGER CHECK (day > 0 AND day < 8),\n"
+            + " name TEXT,\n"
+            + " checked BOOLEAN NOT NULL CHECK (checked IN (0, 1)),"
+            + " PRIMARY KEY (day, name));";
+        String insert = "INSERT INTO checklist(day, name, checked) VALUES(?, ?, ?)";
         try {
-            save = new FileWriter("sav/sav.txt");
-            BufferedWriter buffer = new BufferedWriter(save);
+            // Get a connection to database
+            conn = DriverManager.getConnection("jdbc:sqlite:sav/sav.db");
+            // Create a statement
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(drop);
+            stmt.execute(query);
+            PreparedStatement pstmt = conn.prepareStatement(insert);
+            // Execute SQLite query
+            
+            // Process the result set
+
             for (int i = 1; i <= DayOfWeek.values().length; i++) {
                 List<Item> l = checklistModel.getListByDay(DayOfWeek.of(i));
                 if (l != null) {
                     for (int j = 0; j < l.size(); j++) {
                         String text = l.get(j).getText();
                         boolean checked = l.get(j).getCheckbox().isSelected();
-                        buffer.write(Integer.toString(i));
-                        buffer.newLine();
-                        buffer.write(text);
-                        buffer.newLine();
-                        if (checked) buffer.write("TRUE");
-                        else buffer.write("FALSE");
-                        buffer.newLine();
+                        pstmt.setInt(1, i);
+                        pstmt.setString(2, text);
+                        pstmt.setBoolean(3, checked);
+                        pstmt.executeUpdate();
                     }
                 }
             }
-            buffer.close();
-        } catch (IOException e) {
+
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
-        
-
-    }
-
-    /*
-     * SAVE FILE STRUCTURE
-     * 
-     * DAY
-     * String - Item text
-     * Boolean - Item checked or not
-     * repeat for every item in the list
-     * repeat for every day of the week
-     */
-
-     private void readFile() {
-        FileReader save;
-        try {
-            save = new FileReader("sav/sav.txt");
-            if (save != null) {
-                BufferedReader buffer = new BufferedReader(save);
-                
-                String day = buffer.readLine();
-                while (day != null) {
-                    String text = buffer.readLine();
-                    boolean checked = Boolean.valueOf(buffer.readLine());
-                    JCheckBox chk = new JCheckBox(text);
-                    chk.setSize(frameWidth - 40, 20);
-                    chk.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
-                    chk.setSelected(checked);
-                    checklistModel.add(DayOfWeek.of(Integer.parseInt(day)), new Item(text, DayOfWeek.of(Integer.parseInt(day)), chk));
-                    day = buffer.readLine();
+        finally {
+            try {
+                if (conn != null) {
+                    conn.close();
                 }
-                buffer.close();
-                updateList();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
             }
-        } catch (IOException e) {
-            System.out.println("File not found, no save data will be loaded.");
+        }
+     }
+
+     private void readDB() {
+        Connection conn = null;
+        // String query = "CREATE TABLE IF NOT EXISTS checklist (\n" 
+        //     + " id integer PRIMARY KEY,\n"
+        //     + " name text NOT NULL\n" 
+        //     + ");";
+        String query = "SELECT day, name, checked FROM checklist;";
+        try {
+            // Get a connection to database
+            conn = DriverManager.getConnection("jdbc:sqlite:sav/sav.db");
+            // Create a statement
+            Statement stmt = conn.createStatement();
+            // Execute SQLite query
+            ResultSet res = stmt.executeQuery(query);
+            // Process the result set
+            while (res.next()) {
+                System.out.println(res.getInt("day") + ", " + res.getString("name") + ", " + res.getBoolean("checked"));
+                int day = res.getInt("day");
+                String text = res.getString("name");
+                boolean checked = res.getBoolean("checked");
+                JCheckBox chk = new JCheckBox(text);
+                chk.setSize(frameWidth - 40, 20);
+                chk.setMargin(new Insets(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
+                chk.setSelected(checked);
+                checklistModel.add(DayOfWeek.of(day), new Item(text, DayOfWeek.of(day), chk));
+            }
+            updateList();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
         }
      }
 
@@ -409,7 +441,9 @@ public class gui {
         c.anchor = GridBagConstraints.LAST_LINE_START;
         panel.add(bp, c);
 
-        readFile();
+        //readFile();
+        //writeDB();
+        readDB();
         
         frame.getContentPane().add(panel);
         frame.setVisible(true);
@@ -429,6 +463,16 @@ public class gui {
         frame.repaint();
     }
     public static void main(String args[]) {
+        // try {
+        //     // The newInstance() call is a work around for some
+        //     // broken Java implementations
+        //     Class.forName("com.sqlite.JDBC");
+        //   } catch (Exception ex) {
+        //     // handle the error
+        //     ex.printStackTrace();
+        //   }
+
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -436,7 +480,8 @@ public class gui {
                     gui g = new gui();
                     Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                         public void run() {
-                            g.writeFile();
+                            // g.writeFile();
+                            g.writeDB();
                         }
                     }));
                 } catch (Exception e) {
