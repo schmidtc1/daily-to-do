@@ -298,6 +298,7 @@ public class gui {
                     del.setBorder(BorderFactory.createEmptyBorder(topCheckMargin, sideCheckMargin, topCheckMargin, sideCheckMargin));
                     del.setContentAreaFilled(false);
                     del.addActionListener(delete);
+                    del.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     
                     JPanel delPanel = new JPanel();
                     delPanel.setLayout(new BoxLayout(delPanel, BoxLayout.LINE_AXIS));
